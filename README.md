@@ -8,6 +8,7 @@
 - `network`：供回水管网 RC 模型。考虑管网水体热容、管网热阻、土壤温度和水流携带热量。
 - `load`：建筑负荷 RC 模型。当前为两节点模型：室内空气节点和室内物品/墙体热质节点。
 - `calibration`：建筑 RC 参数识别模块。支持固定参数模型和基于实测数据的参数估计模型。
+- `flexibility`：可调潜力量化指标模块。用于根据基线功率、响应功率和反弹功率曲线计算正式评价指标。
 - `results`：结果输出模块。负责输出 CSV 和 PNG 图。
 - `system`：系统耦合仿真模块。连接冷站、供水管网、建筑和回水管网。
 
@@ -445,6 +446,49 @@ src/district_cooling/operation/inputs/chiller_reference_parameters.json
 释冰+基载
 释冰+基载+双工况
 ```
+
+## 可调潜力量化模块
+
+正式可调潜力量化模块位于：
+
+```text
+src/district_cooling/flexibility/
+```
+
+该模块保留项目方案中的通用指标体系，输入为三类功率曲线：
+
+```text
+P_base(t)      常规运行状态下的系统功率
+P_dr(t)        削峰响应时段内的系统功率
+P_reb(t)       响应结束后的反弹阶段系统功率
+```
+
+当前实现的主要指标为：
+
+```text
+A  = max(P_base - P_dr)                         最大削减功率
+TA = t_Amax - t_drst                            到达最大削减功率时间
+a  = integral(P_base - P_dr)dt / (t_drend-t_drst) 平均削减功率
+B  = max(P_reb - P_base)                        最大反弹功率
+Tb = t_rebend - t_drend                         反弹时间
+b  = integral(P_reb - P_base)dt / Tb             平均反弹功率
+ΔX = X_joint - X_single                         绝对协同效应
+ΔX% = ΔX / X_single * 100%                      相对协同效应
+```
+
+其中综合可调能力暂保留为可配置函数：
+
+```text
+F = f(P_base, P_dr, P_reb)
+```
+
+代码默认先使用保守净值：
+
+```text
+F = A - B
+```
+
+注意：`operation/flexibility_potential.py` 中的冷站侧可调潜力估算仍然保留。它用于从冷站工况、蓄冰剩余量和冷机 COP 快速估算站侧可调边界；`flexibility/metrics.py` 则用于后续全系统仿真后，对基线、响应和反弹曲线进行统一评价。
 
 > A Method for Rapid Quantification of the Flexibility Potential of District Cooling Systems
 
