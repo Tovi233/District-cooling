@@ -1,0 +1,58 @@
+{
+  "dataset_name": "wzs_building_calibration_with_structured_prior_dynamic_fitted_parameters",
+  "measurement_csv_path": "data/processed/wzs_building_calibration.csv",
+  "building_input_path": "src/district_cooling/load/inputs/building_basic.json",
+  "output_dir": "run_cache/building_measurement_run_with_structured_prior_dynamic_fitted_parameters",
+  "building_type_prior": {
+    "path": "src/district_cooling/load/inputs/building_type_rc_priors.json",
+    "category": "office",
+    "apply_as_hard_bounds": false
+  },
+  "columns": {
+    "time": "time",
+    "elapsed_h": "elapsed_h",
+    "outdoor_air_temperature_c": "outdoor_air_temperature_c",
+    "measured_indoor_temperature_c": "indoor_average_temperature_c",
+    "measured_cooling_load_kw": "cooling_load_kw",
+    "measured_internal_load_kw": null,
+    "measured_solar_gain_kw": "measured_solar_gain_kw",
+    "water_flow_m3_h": "water_flow_m3_h",
+    "supply_water_temperature_c": "supply_water_temperature_c",
+    "return_water_temperature_c": "return_water_temperature_c"
+  },
+  "solar_measurement": {
+    "source_csv_path": "data/XIHE_Meteorological_Data_1784520445.csv",
+    "encoding": "gb18030",
+    "skip_rows": 7,
+    "date_column": "日期",
+    "time_column": "时间",
+    "direct_irradiance_column": "法向直接辐射W/m^2",
+    "diffuse_irradiance_column": "散射辐射W/m^2",
+    "output_irradiance_column": "measured_solar_irradiance_w_m2",
+    "output_gain_column": "measured_solar_gain_kw",
+    "equivalent_solar_gain_area_m2": 130.0,
+    "clip_negative": true
+  },
+  "model_inputs": {
+    "use_measured_outdoor_temperature": true,
+    "use_measured_water_side_q_ac": true,
+    "water_density_kg_per_m3": 1000.0,
+    "water_specific_heat_j_per_kg_k": 4180.0,
+    "use_measured_cooling_load_as_q_ac": false,
+    "use_measured_internal_load_as_internal_load": false,
+    "use_measured_solar_gain": true,
+    "use_building_internal_load_schedule": true,
+    "use_building_solar_gain_schedule": false,
+    "use_building_thermal_mass_load_schedule": true,
+    "use_building_thermal_mass_heat_capacity_schedule": false,
+    "initialize_indoor_temperature_from_measured_column": true,
+    "initialize_thermal_mass_temperature_from_measured_indoor": true,
+    "clamp_negative_cooling_load_to_zero": true
+  },
+  "calibration_multipliers": {
+    "R_outwall": 0.000028028969910285686,
+    "R_m": 0.000009215839903992229,
+    "C_indoor": 1866970941.4997623,
+    "C_m": 108476230612.85835
+  }
+}

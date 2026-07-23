@@ -1,0 +1,56 @@
+{
+  "source": "表 3-1 一期冷水机组主要性能参数",
+  "units": {
+    "cooling_capacity_kw": "kW",
+    "rated_motor_power_kw": "kW",
+    "cop": "-",
+    "leaving_entering_chilled_water_temp_c": "degC",
+    "entering_leaving_cooling_water_temp_c": "degC"
+  },
+  "dual_mode_centrifugal_chiller": {
+    "quantity_design": 3,
+    "air_conditioning_mode": {
+      "cooling_capacity_kw": 5415.0,
+      "rated_motor_power_kw": 928.4,
+      "cop": 5.83,
+      "leaving_entering_chilled_water_temp_c": "11/6",
+      "entering_leaving_cooling_water_temp_c": "31/36",
+      "total_cooling_capacity_kw": 16245.0,
+      "total_rated_motor_power_kw": 2785.2
+    },
+    "ice_making_mode": {
+      "cooling_capacity_kw": 4220.0,
+      "rated_motor_power_kw": 1026.0,
+      "cop": 4.11,
+      "leaving_entering_glycol_temp_c": "-2.2/-5.6",
+      "entering_leaving_cooling_water_temp_c": "30/33.5",
+      "total_cooling_capacity_kw": 12660.0,
+      "total_rated_motor_power_kw": 3078.0
+    }
+  },
+  "base_centrifugal_chiller": {
+    "quantity_design": 1,
+    "air_conditioning_mode": {
+      "cooling_capacity_kw": 3868.0,
+      "rated_motor_power_kw": 675.5,
+      "cop": 5.73,
+      "leaving_entering_chilled_water_temp_c": "12/4",
+      "entering_leaving_cooling_water_temp_c": "31/36",
+      "total_cooling_capacity_kw": 3868.0,
+      "total_rated_motor_power_kw": 675.5
+    },
+    "nominal_mode": {
+      "cooling_capacity_kw": 3868.0,
+      "rated_motor_power_kw": 570.9,
+      "cop": 6.78,
+      "leaving_entering_chilled_water_temp_c": "12/7",
+      "entering_leaving_cooling_water_temp_c": "30/35",
+      "total_cooling_capacity_kw": 3868.0,
+      "total_rated_motor_power_kw": 570.9
+    }
+  },
+  "total_air_conditioning_mode": {
+    "cooling_capacity_kw": 20113.0,
+    "rated_motor_power_kw": 3460.7
+  }
+}

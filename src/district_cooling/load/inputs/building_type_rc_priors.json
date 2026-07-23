@@ -1,0 +1,68 @@
+{
+  "description": "2R2C public-building RC parameter prior ranges collected from multiple buildings. Source U_z and U_1 are stored as original U values and mapped to this project as R = 1 / U because this project uses heat-flow terms of the form (T_a - T_b) / R.",
+  "model_structure": "2R2C",
+  "parameter_mapping": {
+    "U_z": "R_outwall",
+    "U_1": "R_m",
+    "C_1": "C_m",
+    "Cin": "C_indoor",
+    "A_sol": "not_used_currently"
+  },
+  "categories": {
+    "commercial_shopping": {
+      "name_cn": "商业购物",
+      "mean_accuracy": 0.87,
+      "source": {
+        "U_z": {"min": 498.9196, "max": 121246.5471, "mean": 10698.1077},
+        "U_1": {"min": 0.1785, "max": 135715.7563, "mean": 12556.3435},
+        "C_1": {"min": 1000.0002, "max": 10000000000.0, "mean": 1411921276.1901},
+        "A_sol": {"min": 4.6726, "max": 714.8921, "mean": 130.3862},
+        "Cin": {"min": 1483646.8102, "max": 565518537.2837, "mean": 49238495.1966}
+      }
+    },
+    "office": {
+      "name_cn": "办公建筑",
+      "mean_accuracy": 0.8256,
+      "source": {
+        "U_z": {"min": 329.2552, "max": 340449.1219, "mean": 44817.255},
+        "U_1": {"min": 539.6896, "max": 282147.4112, "mean": 55187.1643},
+        "C_1": {"min": 19415458.8517, "max": 10000000000.0, "mean": 6263786454.8765},
+        "A_sol": {"min": 0.1, "max": 1415.1481, "mean": 438.206},
+        "Cin": {"min": 933314.4684, "max": 1313568963.9651, "mean": 218881017.2555}
+      }
+    },
+    "low_rise_residential": {
+      "name_cn": "低层住宅",
+      "mean_accuracy": 0.86847,
+      "source": {
+        "U_z": {"min": 310.4663, "max": 105721.3228, "mean": 4784.3132},
+        "U_1": {"min": 544.9864, "max": 104278.4018, "mean": 6933.4361},
+        "C_1": {"min": 24473674.8032, "max": 10000000000.0, "mean": 639924179.4459},
+        "A_sol": {"min": 11.5125, "max": 871.781, "mean": 113.8352},
+        "Cin": {"min": 888780.6061, "max": 522351301.1327, "mean": 20285934.9532}
+      }
+    },
+    "mid_rise_residential": {
+      "name_cn": "中层住宅",
+      "mean_accuracy": 0.8851,
+      "source": {
+        "U_z": {"min": 1291.5665, "max": 51395.6258, "mean": 13506.307},
+        "U_1": {"min": 3167.1455, "max": 71379.2022, "mean": 21874.5595},
+        "C_1": {"min": 208015976.6276, "max": 9297249812.2732, "mean": 2385931786.8156},
+        "A_sol": {"min": 40.3366, "max": 762.9457, "mean": 237.8376},
+        "Cin": {"min": 4625141.8669, "max": 240168775.8539, "mean": 61585755.5275}
+      }
+    },
+    "high_rise_residential": {
+      "name_cn": "高层住宅",
+      "mean_accuracy": 0.8751,
+      "source": {
+        "U_z": {"min": 1000.0, "max": 231247.0866, "mean": 39328.3958},
+        "U_1": {"min": 5000.0, "max": 244882.0744, "mean": 60550.6553},
+        "C_1": {"min": 5000000.0, "max": 10000000000.0, "mean": 6364927772.915},
+        "A_sol": {"min": 50.0, "max": 1451.4011, "mean": 574.5336},
+        "Cin": {"min": 18205167.8918, "max": 965899365.6591, "mean": 189342728.957}
+      }
+    }
+  }
+}

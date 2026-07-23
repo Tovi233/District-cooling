@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "district-cooling-rc"
+version = "0.1.0"
+description = "Regional district-cooling RC models in Python"
+requires-python = ">=3.10"
+dependencies = ["Pillow", "openpyxl>=3.1", "pandas>=2.2", "scipy>=1.13"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

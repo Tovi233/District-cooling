@@ -1,0 +1,110 @@
+{
+  "model": {
+    "geometry": {
+      "building_count": 1.0,
+      "floors_per_building": 12.0,
+      "total_floor_area_m2": 6500.0,
+      "floor_height_m": 3.5
+    },
+    "indoor_air": {
+      "effective_volumetric_heat_capacity_j_per_m3_k": 90000.0
+    },
+    "interior_wall_estimation": {
+      "description": "office-building interior partition wall volume estimated from single-floor area",
+      "office_module": {
+        "width_m": 4.95,
+        "depth_m": 5.70
+      },
+      "wall_thickness_m": 0.1,
+      "plan_aspect_ratio": 1.0,
+      "layout_complexity_factor": 1.0
+    },
+    "indoor_object_heat_capacity_per_floor_area_j_per_m2_k": 10000000.0,
+    "outwall_layer": {
+      "material": "cement",
+      "thickness_m": 0.2,
+      "thermal_conductivity_w_per_m_k": 1.4
+    },
+    "mass_exchange": {
+      "description": "indoor thermal mass to indoor air convection and radiation",
+      "heat_transfer_coefficient_w_per_m2_k": 14.0,
+      "heat_transfer_area_sources": [
+        "total_floor_area_m2",
+        "exterior_wall_area_m2"
+      ]
+    },
+    "thermal_mass_heat_capacity_layers": [
+      {
+        "name": "floor_slab_cement_heat_capacity",
+        "material": "cement",
+        "area_source": "total_floor_area_m2",
+        "thickness_m": 0.2,
+        "density_kg_per_m3": 2400.0,
+        "specific_heat_j_per_kg_k": 880.0
+      },
+      {
+        "name": "outwall_cement_heat_capacity",
+        "material": "cement",
+        "area_source": "exterior_wall_area_m2",
+        "thickness_m": 0.2,
+        "density_kg_per_m3": 2400.0,
+        "specific_heat_j_per_kg_k": 880.0
+      },
+      {
+        "name": "interior_partition_wall_heat_capacity",
+        "material": "cement",
+        "area_source": "interior_wall_area_m2",
+        "thickness_m": 0.1,
+        "density_kg_per_m3": 2400.0,
+        "specific_heat_j_per_kg_k": 880.0
+      }
+    ]
+  },
+  "initial_state": {
+    "indoor_air_temperature_c": 26.0,
+    "thermal_mass_temperature_c": 25.5
+  },
+  "simulation": {
+    "time_step_s": 300.0,
+    "steps": 288
+  },
+  "inputs": {
+    "outdoor_air_temperature_c": 32.0,
+    "internal_load_w": 0.0,
+    "solar_gain_w": 0.0,
+    "cooling_power_w": 0.0,
+    "thermal_mass_load_w": 100000.0
+  },
+  "schedules": {
+    "internal_load_w": [
+      {"time_h": 0, "value": 0.0},
+      {"time_h": 24, "value": 0.0}
+    ],
+    "solar_gain_w": [
+      {"time_h": 0, "value": 0.0},
+      {"time_h": 6, "value": 0.0},
+      {"time_h": 9, "value": 70000.0},
+      {"time_h": 12, "value": 120000.0},
+      {"time_h": 15, "value": 90000.0},
+      {"time_h": 18, "value": 0.0},
+      {"time_h": 24, "value": 0.0}
+    ],
+    "thermal_mass_load_w": [
+      {"time_h": 0, "value": 60000.0},
+      {"time_h": 6, "value": 73333.33333333334},
+      {"time_h": 9, "value": 120000.0},
+      {"time_h": 12, "value": 160000.0},
+      {"time_h": 15, "value": 173333.33333333334},
+      {"time_h": 18, "value": 133333.33333333334},
+      {"time_h": 22, "value": 80000.0},
+      {"time_h": 24, "value": 60000.0}
+    ],
+    "thermal_mass_heat_capacity_j_per_k": [
+      {"time_h": 0, "value": 75000000000.0},
+      {"time_h": 8, "value": 82000000000.0},
+      {"time_h": 14, "value": 90000000000.0},
+      {"time_h": 20, "value": 80000000000.0},
+      {"time_h": 24, "value": 75000000000.0}
+    ]
+  }
+}

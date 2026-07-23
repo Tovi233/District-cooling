@@ -1,0 +1,55 @@
+{
+  "model": {
+    "supply_water_temperature_c": 4.0,
+    "chillers": [
+      {
+        "equipment_name": "dual_duty_centrifugal_chiller",
+        "quantity": 3,
+        "power_supply": "10kV",
+        "service_area": "phase_1_public_buildings",
+        "modes": [
+          {
+            "mode_name": "air_conditioning",
+            "cooling_capacity_kw": 5415.0,
+            "rated_motor_power_kw": 928.4,
+            "cop": 5.83,
+            "chilled_water_temperature": "11C/6C",
+            "cooling_water_temperature": "31C/36C"
+          },
+          {
+            "mode_name": "ice_storage",
+            "cooling_capacity_kw": 4220.0,
+            "rated_motor_power_kw": 1026.0,
+            "cop": 4.11,
+            "chilled_water_temperature": "-2.2C/-5.6C",
+            "cooling_water_temperature": "30C/33.5C"
+          }
+        ]
+      },
+      {
+        "equipment_name": "base_load_centrifugal_chiller",
+        "quantity": 1,
+        "power_supply": "380V",
+        "service_area": "phase_1_base_load",
+        "modes": [
+          {
+            "mode_name": "air_conditioning",
+            "cooling_capacity_kw": 3868.0,
+            "rated_motor_power_kw": 675.5,
+            "cop": 5.73,
+            "chilled_water_temperature": "12C/4C",
+            "cooling_water_temperature": "31C/36C"
+          },
+          {
+            "mode_name": "nominal",
+            "cooling_capacity_kw": 3868.0,
+            "rated_motor_power_kw": 570.9,
+            "cop": 6.78,
+            "chilled_water_temperature": "12C/7C",
+            "cooling_water_temperature": "30C/35C"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "source_excel_path": "data/WZS.xlsx",
+  "output_csv_path": "data/processed/wzs_building_calibration.csv",
+  "output_metadata_path": "data/processed/wzs_building_calibration.json"
+}

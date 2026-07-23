@@ -1,0 +1,88 @@
+{
+  "water_density_kg_m3": 1000.0,
+  "water_specific_heat_kj_kg_k": 4.186,
+  "rated_frequency_hz": 50.0,
+  "max_flow_ratio": 1.15,
+  "use_frequency_to_scale_flow": true,
+  "ignore_chiller_power_for_capacity": false,
+  "note": "Hybrid capacity calculation. CH_01 base chiller power is considered unreliable, so CH_01 uses water-side CHW temperature-difference calculation. Other available chillers use motor power times COP.",
+  "chiller_mappings": [
+    {
+      "chiller_id": "CH_01",
+      "role": "base_chiller",
+      "capacity_method": "water_side",
+      "pump_id": "PUMP_CHW_01",
+      "pump_type": "base_chilled_water_flow_proxy",
+      "rated_flow_m3h": 788.0,
+      "rated_head_mH2O": 25.0,
+      "rated_power_kw": 110.0,
+      "use": true
+    },
+    {
+      "chiller_id": "CH_02",
+      "role": "dual_mode_chiller",
+      "capacity_method": "power_cop",
+      "pump_id": "PUMP_CW_DUAL_01",
+      "pump_type": "dual_mode_cooling_water_pump",
+      "rated_flow_m3h": 1200.0,
+      "rated_head_mH2O": 25.0,
+      "rated_power_kw": 132.0,
+      "cop_air_conditioning": 5.83,
+      "cop_ice_making": 4.11,
+      "ice_making_chw_out_threshold_c": 0.0,
+      "use": true
+    },
+    {
+      "chiller_id": "CH_03",
+      "role": "fault_or_ignored_dual_mode_chiller",
+      "capacity_method": "ignored",
+      "pump_id": "PUMP_CW_DUAL_02",
+      "pump_type": "dual_mode_cooling_water_pump",
+      "rated_flow_m3h": 1200.0,
+      "rated_head_mH2O": 25.0,
+      "rated_power_kw": 132.0,
+      "use": false
+    },
+    {
+      "chiller_id": "CH_04",
+      "role": "converted_base_chiller",
+      "capacity_method": "power_cop",
+      "pump_id": "PUMP_CW_DUAL_03",
+      "pump_type": "dual_mode_cooling_water_pump",
+      "rated_flow_m3h": 1200.0,
+      "rated_head_mH2O": 25.0,
+      "rated_power_kw": 132.0,
+      "cop_air_conditioning": 5.83,
+      "use": true
+    }
+  ],
+  "pump_inventory": {
+    "dual_mode_cooling_water_pump": {
+      "single_flow_m3h": 1200.0,
+      "single_head_mH2O": 25.0,
+      "single_power_kw": 132.0,
+      "total_power_kw": 924.0
+    },
+    "base_cooling_water_pump": {
+      "single_flow_m3h": 788.0,
+      "single_head_mH2O": 25.0,
+      "single_power_kw": 110.0,
+      "total_power_kw": 220.0
+    }
+  },
+  "reference_capacity_limits": {
+    "CH_01": {
+      "reference_role": "base_centrifugal_chiller",
+      "air_conditioning_capacity_kw": 3868.0
+    },
+    "CH_02": {
+      "reference_role": "dual_mode_centrifugal_chiller",
+      "air_conditioning_capacity_kw": 5415.0,
+      "ice_making_capacity_kw": 4220.0
+    },
+    "CH_04": {
+      "reference_role": "dual_mode_chiller_converted_to_base",
+      "air_conditioning_capacity_kw": 5415.0
+    }
+  }
+}

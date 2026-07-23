@@ -1,0 +1,56 @@
+﻿{
+  "dataset_name": "wzs2_building_structured_prior_dynamic_parameter_identification",
+  "mode": "structured_prior_dynamic",
+  "measurement_run_config_path": "src/district_cooling/load/inputs/measurements/wzs2_building_validation_run_config.json",
+  "output_dir": "run_cache/wzs2_building_structured_prior_dynamic_parameter_calibration",
+  "building_type_prior": {
+    "path": "src/district_cooling/load/inputs/building_type_rc_priors.json",
+    "category": "office",
+    "apply_as_hard_bounds": false
+  },
+  "options": {
+    "train_fraction": 0.7,
+    "regularization_weight": 0.04,
+    "optimizer": "scipy_de_l_bfgs_b",
+    "population_size": 8,
+    "random_seed": 37,
+    "max_iterations": 24,
+    "polish": true,
+    "force_level": 2,
+    "dynamic_loss": {
+      "temperature_rmse_weight": 1.0,
+      "cooling_on_threshold_kw": 10.0,
+      "cooling_on_slope_weight": 0.8,
+      "cooling_off_slope_weight": 0.35
+    }
+  },
+  "reference_physical_parameters": {
+    "wall_thickness_m": 0.2,
+    "wall_lambda_w_per_m_k": 1.4,
+    "wall_volumetric_heat_capacity_j_per_m3_k": 2112000.0,
+    "indoor_object_heat_capacity_per_floor_area_j_per_m2_k": 10666666.666666666,
+    "mass_exchange_h_w_per_m2_k": 14.0
+  },
+  "fitted_rc_parameters": {
+    "R_outwall": {
+      "initial": 0.00003653647316527719,
+      "min": 0.000010960941949583157,
+      "max": 0.00010960941949583157
+    },
+    "R_m": {
+      "initial": 0.000010989010989010989,
+      "min": 0.0000032967032967032967,
+      "max": 0.00005494505494505495
+    },
+    "C_indoor": {
+      "initial": 2047500000.0,
+      "min": 1023750000.0,
+      "max": 4095000000.0
+    },
+    "C_m": {
+      "initial": 70984911931.78996,
+      "min": 21295473579.536987,
+      "max": 212954735795.36987
+    }
+  }
+}

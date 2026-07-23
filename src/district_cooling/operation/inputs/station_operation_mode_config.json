@@ -1,0 +1,14 @@
+{
+  "design_cooling_capacity_kw": 20113.0,
+  "standby_cooling_load_kw": 500.0,
+  "standby_flow_m3h": 300.0,
+  "ice_delta_threshold_per_step": 50.0,
+  "chiller_status_on_threshold": 0.5,
+  "chiller_power_on_threshold_kw": 20.0,
+  "tower_power_on_threshold_kw": 1.0,
+  "pump_power_on_threshold_kw": 1.0,
+  "ice_making_supply_temp_threshold_c": 0.0,
+  "base_chiller_ids": ["CH_01", "CH_04"],
+  "dual_mode_chiller_ids": ["CH_02"],
+  "ignored_chiller_ids": ["CH_03"]
+}

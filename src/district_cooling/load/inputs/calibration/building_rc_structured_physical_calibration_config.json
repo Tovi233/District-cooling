@@ -1,0 +1,81 @@
+{
+  "dataset_name": "wzs_building_structured_physical_parameter_identification",
+  "mode": "structured",
+  "measurement_run_config_path": "src/district_cooling/load/inputs/measurements/wzs_building_run_config.json",
+  "output_dir": "run_cache/wzs_heuristic_initial_fitted_transfer/calibration",
+  "building_type_prior": {
+    "path": "src/district_cooling/load/inputs/building_type_rc_priors.json",
+    "category": "office",
+    "apply_as_hard_bounds": false
+  },
+  "options": {
+    "train_fraction": 0.7,
+    "regularization_weight": 0.2,
+    "rc_prior_constraint_weight": 1.0,
+    "rc_prior_constraint_parameters": [
+      "R_m",
+      "C_indoor"
+    ],
+    "rc_prior_mean_weight": 0.0,
+    "rc_prior_mean_parameters": [],
+    "optimizer": "scipy_de_l_bfgs_b",
+    "population_size": 10,
+    "random_seed": 31,
+    "max_iterations": 32,
+    "polish": true,
+    "force_level": 4,
+    "dynamic_loss": {
+      "temperature_rmse_weight": 1.0,
+      "cooling_on_threshold_kw": 10.0,
+      "cooling_on_slope_weight": 0.8,
+      "cooling_off_slope_weight": 1.2
+    }
+  },
+  "structured_parameters": {
+    "wall_thickness_m": {
+      "initial": 0.2,
+      "min": 0.05,
+      "max": 0.35
+    },
+    "wall_lambda_w_per_m_k": {
+      "initial": 1.4,
+      "min": 0.8,
+      "max": 2.0
+    },
+    "wall_volumetric_heat_capacity_j_per_m3_k": {
+      "initial": 2112000.0,
+      "min": 1500000.0,
+      "max": 2600000.0
+    },
+    "floor_slab_thickness_m": {
+      "initial": 0.2,
+      "min": 0.08,
+      "max": 0.3
+    },
+    "floor_slab_lambda_w_per_m_k": {
+      "initial": 1.4,
+      "min": 0.8,
+      "max": 2.0
+    },
+    "floor_slab_volumetric_heat_capacity_j_per_m3_k": {
+      "initial": 2112000.0,
+      "min": 1500000.0,
+      "max": 2600000.0
+    },
+    "indoor_object_heat_capacity_per_floor_area_j_per_m2_k": {
+      "initial": 500000.0,
+      "min": 100000.0,
+      "max": 1000000.0
+    },
+    "mass_exchange_h_w_per_m2_k": {
+      "initial": 14.0,
+      "min": 2.0,
+      "max": 25.0
+    },
+    "indoor_air_effective_capacity_j_per_m3_k": {
+      "initial": 57739.0,
+      "min": 1200.0,
+      "max": 57739.3
+    }
+  }
+}

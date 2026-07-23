@@ -1,0 +1,55 @@
+{
+  "dataset_name": "wzs2_building_validation",
+  "measurement_csv_path": "data/processed/wzs2_building_validation.csv",
+  "building_input_path": "src/district_cooling/load/inputs/building_basic.json",
+  "output_dir": "run_cache/wzs2_building_validation_run",
+  "building_type_prior": {
+    "path": "src/district_cooling/load/inputs/building_type_rc_priors.json",
+    "category": "office",
+    "apply_as_hard_bounds": false
+  },
+  "columns": {
+    "time": "time",
+    "elapsed_h": "elapsed_h",
+    "outdoor_air_temperature_c": "outdoor_air_temperature_c",
+    "measured_indoor_temperature_c": "indoor_average_temperature_c",
+    "measured_cooling_load_kw": "cooling_load_kw",
+    "measured_internal_load_kw": null,
+    "measured_solar_gain_kw": null,
+    "water_flow_m3_h": "water_flow_m3_h",
+    "supply_water_temperature_c": "supply_water_temperature_c",
+    "return_water_temperature_c": "return_water_temperature_c"
+  },
+  "model_inputs": {
+    "use_measured_outdoor_temperature": true,
+    "use_measured_water_side_q_ac": true,
+    "water_density_kg_per_m3": 1000.0,
+    "water_specific_heat_j_per_kg_k": 4180.0,
+    "use_measured_cooling_load_as_q_ac": false,
+    "use_measured_internal_load_as_internal_load": false,
+    "use_measured_solar_gain": false,
+    "use_building_internal_load_schedule": true,
+    "use_building_solar_gain_schedule": true,
+    "use_building_thermal_mass_load_schedule": true,
+    "use_building_thermal_mass_heat_capacity_schedule": false,
+    "initialize_indoor_temperature_from_measured_column": true,
+    "initialize_thermal_mass_temperature_from_measured_indoor": true,
+    "clamp_negative_cooling_load_to_zero": true,
+    "max_internal_step_s": 60.0
+  },
+  "initial_state": {
+    "thermal_mass_temperature_method": "heuristic_clock_hour",
+    "thermal_mass_temperature_heuristic": {
+      "clock_hour_offsets": [
+        {"start_hour": 0.0, "offset_c": 0.2},
+        {"start_hour": 6.0, "offset_c": 0.5},
+        {"start_hour": 10.0, "offset_c": 1.0},
+        {"start_hour": 14.0, "offset_c": 1.8},
+        {"start_hour": 19.0, "offset_c": 1.0},
+        {"start_hour": 24.0, "offset_c": 0.2}
+      ],
+      "minimum_offset_c": -1.0,
+      "maximum_offset_c": 3.0
+    }
+  }
+}

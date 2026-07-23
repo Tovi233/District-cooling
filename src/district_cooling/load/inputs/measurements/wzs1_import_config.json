@@ -1,0 +1,6 @@
+{
+  "dataset_name": "wzs1_building_validation",
+  "source_excel_path": "data/WZS1.xlsx",
+  "output_csv_path": "data/processed/wzs1_building_validation.csv",
+  "output_metadata_path": "data/processed/wzs1_building_validation.json"
+}

@@ -1,0 +1,16 @@
+{
+  "rt_to_kwh": 3.517,
+  "target_response_duration_h": 2.0,
+  "ice_reserve_fraction": 0.1,
+  "usable_ice_fraction": 0.85,
+  "mechanical_cooling_cop": 5.8,
+  "ice_making_cop": 4.11,
+  "restore_duration_h": 4.0,
+  "max_ice_discharge_power_kw": null,
+  "max_ice_discharge_quantile": 0.95,
+  "min_reducible_power_kw_for_available": 1000.0,
+  "min_duration_h_for_available": 1.0,
+  "min_reducible_power_kw_for_cautious": 300.0,
+  "min_duration_h_for_cautious": 0.5,
+  "note": "First-stage cold-station-only flexibility estimation. Ice inventory is treated as remaining cooling energy in RT-h and converted with 1 RT-h = 3.517 kWh. If max_ice_discharge_power_kw is null, the observed positive ice-discharge-power quantile is used."
+}
