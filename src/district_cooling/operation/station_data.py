@@ -10,6 +10,7 @@ from openpyxl import load_workbook
 
 
 DATA_SHEET_PREFIXES = ("7.",)
+CH01_POWER_CORRECTION_FACTOR = 13.0
 
 
 @dataclass(frozen=True)
@@ -96,4 +97,17 @@ def load_station_workbook(path: str | Path) -> tuple[pd.DataFrame, list[StationC
             continue
         data[column] = pd.to_numeric(data[column], errors="coerce")
 
+    _apply_temporary_power_corrections(data)
     return data, list(column_meta.values())
+
+
+def _apply_temporary_power_corrections(data: pd.DataFrame) -> None:
+    ch01_power_col = "CH_01__power_kw"
+    total_power_col = "SYS_TOTAL__power_kw"
+    if ch01_power_col not in data.columns:
+        return
+
+    original_ch01_power = data[ch01_power_col].copy()
+    data[ch01_power_col] = original_ch01_power * CH01_POWER_CORRECTION_FACTOR
+    if total_power_col in data.columns:
+        data[total_power_col] = data[total_power_col] + original_ch01_power * (CH01_POWER_CORRECTION_FACTOR - 1.0)

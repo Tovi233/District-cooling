@@ -23,18 +23,19 @@ MODE_MAP = {
 
 LEVEL_MAP = {
     "����Ӧ": "可响应",
-    "������Ӧ": "谨慎响应",
+    "������Ӧ": "有限响应",
+    "谨慎响应": "有限响应",
     "��������Ӧ": "不建议响应",
 }
 
 LEVEL_COLORS = {
     "可响应": "#2E7D32",
-    "谨慎响应": "#F2A900",
+    "有限响应": "#F2A900",
     "不建议响应": "#9E9E9E",
 }
 
 MODE_ORDER = ["制冰", "基载", "基载+双工况", "释冰+基载", "释冰+基载+双工况", "异常"]
-LEVEL_ORDER = ["可响应", "谨慎响应", "不建议响应"]
+LEVEL_ORDER = ["可响应", "有限响应", "不建议响应"]
 
 W, H = 2600, 1650
 
@@ -88,6 +89,7 @@ def _draw_time_series(draw: ImageDraw.ImageDraw, df: pd.DataFrame, box: tuple[in
             ("当前总功率", "#1F77B4"),
             ("停止/降低制冰", "#FF7F0E"),
             ("蓄冰替代冷机", "#D62728"),
+            ("供水温度上调", "#0891B2"),
         ],
         fonts["small"],
     )
@@ -106,11 +108,16 @@ def _stacked_response_bars(
     bar_w = max(1, int(plot_w / max(n, 1) * 0.86))
     stop_values = pd.to_numeric(df["stop_ice_making_power_kw"], errors="coerce").fillna(0).to_numpy()
     shift_values = pd.to_numeric(df["load_shift_power_kw"], errors="coerce").fillna(0).to_numpy()
-    for i, (stop_kw, shift_kw) in enumerate(zip(stop_values, shift_values)):
+    supply_values = (
+        pd.to_numeric(df["supply_temp_reduction_power_kw"], errors="coerce").fillna(0).to_numpy()
+        if "supply_temp_reduction_power_kw" in df
+        else [0.0] * len(df)
+    )
+    for i, (stop_kw, shift_kw, supply_kw) in enumerate(zip(stop_values, shift_values, supply_values)):
         x = x0 + int(i * plot_w / max(n - 1, 1))
         x_left = max(x0, x - bar_w // 2)
         x_right = min(x1, x_left + bar_w)
-        if stop_kw <= 0 and shift_kw <= 0:
+        if stop_kw <= 0 and shift_kw <= 0 and supply_kw <= 0:
             continue
         base_y = y1
         if stop_kw > 0:
@@ -120,6 +127,10 @@ def _stacked_response_bars(
         if shift_kw > 0:
             top_y = _value_y(stop_kw + shift_kw, v_min, v_max, y0, y1)
             draw.rectangle((x_left, top_y, x_right, base_y), fill="#D62728")
+            base_y = top_y
+        if supply_kw > 0:
+            top_y = _value_y(stop_kw + shift_kw + supply_kw, v_min, v_max, y0, y1)
+            draw.rectangle((x_left, top_y, x_right, base_y), fill="#0891B2")
 
 
 def _draw_metrics(draw: ImageDraw.ImageDraw, df: pd.DataFrame, box: tuple[int, int, int, int], fonts: dict) -> None:
@@ -132,6 +143,7 @@ def _draw_metrics(draw: ImageDraw.ImageDraw, df: pd.DataFrame, box: tuple[int, i
         ("平均总功率", df["power_kw"].mean(), "kW"),
         ("平均可削减功率", df["reducible_power_kw"].mean(), "kW"),
         ("最大可削减功率", df["reducible_power_kw"].max(), "kW"),
+        ("供水温度上调削减", df.get("supply_temp_reduction_power_kw", pd.Series([0])).mean(), "kW"),
         ("平均响应时长", df["response_duration_h"].mean(), "h"),
         ("平均可转移冷量", df["transferable_cooling_energy_kwh"].mean(), "kWh"),
         ("平均反弹功率", df["rebound_power_kw"].mean(), "kW"),
@@ -229,6 +241,7 @@ def _build_summary_text(df: pd.DataFrame) -> str:
         f"- 本次共计算 {len(df)} 个15分钟时刻，折合 {total_h:.2f} h。",
         f"- 平均冷负荷为 {df['cooling_load_kw'].mean():.1f} kW，平均总功率为 {df['power_kw'].mean():.1f} kW。",
         f"- 平均可削减功率为 {df['reducible_power_kw'].mean():.1f} kW，最大可削减功率为 {df['reducible_power_kw'].max():.1f} kW。",
+        f"- 供水温度上调带来的平均可削减功率为 {df.get('supply_temp_reduction_power_kw', pd.Series([0])).mean():.1f} kW。",
         f"- 平均可响应时长为 {df['response_duration_h'].mean():.2f} h，平均可转移冷量为 {df['transferable_cooling_energy_kwh'].mean():.1f} kWh。",
         f"- 平均反弹功率为 {df['rebound_power_kw'].mean():.1f} kW。",
         "",

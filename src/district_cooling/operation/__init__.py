@@ -13,12 +13,16 @@ from .flexibility_potential import (
     summarize_flexibility,
 )
 from .mode_rules import ModeRuleConfig, classify_operation_modes
+from .realtime_advisor import RealtimeAdvice, RealtimeStationState, advise_realtime_operation
 from .station_data import load_station_workbook
 
 __all__ = [
     "ModeRuleConfig",
+    "RealtimeAdvice",
+    "RealtimeStationState",
     "StationFlexibilityConfig",
     "WaterSideCapacityConfig",
+    "advise_realtime_operation",
     "calculate_water_side_capacity",
     "classify_operation_modes",
     "estimate_station_flexibility",

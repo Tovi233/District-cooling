@@ -1,0 +1,11 @@
+{
+  "project_phase": "一期",
+  "equipment_name": "蓄冰盘管",
+  "group_count": 25,
+  "single_group_storage_capacity_kwh": 3250.0,
+  "single_group_storage_capacity_rth": 924.0,
+  "total_storage_capacity_kwh": 81239.0,
+  "total_storage_capacity_rth": 23100.0,
+  "rt_to_kwh": 3.517,
+  "calculation_note": "User-provided design data. The total design value 81239 kWh is used as the authoritative phase-1 storage capacity; single-group values are retained for traceability."
+}

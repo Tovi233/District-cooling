@@ -206,7 +206,7 @@ def build():
     rebound = draw_box(draw, 1525, y4, 330, h4, "18 估算反弹功率", "考虑响应后需要补回的制冰量\n评估后续反弹风险", "calc_fill", SMALL_BODY_FONT)
     level_decision = draw_diamond(draw, 1300, y4 - 4, 178, 174, "19 响应等级\n判断")
     level_ok = draw_box(draw, 1070, y4, 180, h4, "20 可响应", "削减能力和持续时间\n均满足响应要求", "mode_fill", SMALL_BODY_FONT)
-    level_mid = draw_box(draw, 855, y4, 180, h4, "21 谨慎响应", "具备一定削减能力\n但持续性或余量有限", "decision_fill", SMALL_BODY_FONT)
+    level_mid = draw_box(draw, 855, y4, 180, h4, "21 有限响应", "具备一定削减能力\n但持续性或余量有限", "decision_fill", SMALL_BODY_FONT)
     level_no = draw_box(draw, 640, y4, 180, h4, "22 其他", "不建议响应", "warning_fill", SMALL_BODY_FONT)
     output = draw_box(
         draw,

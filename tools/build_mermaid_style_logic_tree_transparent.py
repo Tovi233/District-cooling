@@ -185,7 +185,7 @@ def build():
         arrow(draw, pt_bottom(first), pt_top(second))
 
     V = box(draw, 420, 1980, 300, 78, "可响应", "mode_fill")
-    Wb = box(draw, 800, 1980, 300, 78, "谨慎响应", "decision_fill")
+    Wb = box(draw, 800, 1980, 300, 78, "有限响应", "decision_fill")
     X = box(draw, 1180, 1980, 300, 78, "不建议响应", "warning_fill")
     arrow(draw, pt_bottom(U), pt_top(V), "满足要求")
     arrow(draw, pt_bottom(U), pt_top(Wb), "余量有限")

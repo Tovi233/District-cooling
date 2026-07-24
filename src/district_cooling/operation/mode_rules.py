@@ -24,6 +24,13 @@ class ModeRuleConfig:
     base_chiller_ids: tuple[str, ...] = field(default_factory=lambda: ("CH_01", "CH_04"))
     dual_mode_chiller_ids: tuple[str, ...] = field(default_factory=lambda: ("CH_02",))
     ignored_chiller_ids: tuple[str, ...] = field(default_factory=lambda: ("CH_03",))
+    chiller_flow_m3h: dict[str, float] = field(
+        default_factory=lambda: {
+            "CH_01": 788.0,
+            "CH_02": 1200.0,
+            "CH_04": 1200.0,
+        }
+    )
 
 
 def classify_operation_modes(data: pd.DataFrame, config: ModeRuleConfig | None = None) -> pd.DataFrame:
@@ -35,6 +42,7 @@ def classify_operation_modes(data: pd.DataFrame, config: ModeRuleConfig | None =
     features["flow_m3h"] = _numeric(data, "SYS_TOTAL__flow_m3h")
     features["power_kw"] = _numeric(data, "SYS_TOTAL__power_kw")
     features["ice_inventory"] = _numeric(data, "ICE_01__inventory_rt")
+    features["total_supply_temp_c"] = _total_supply_temperature(data)
     features["ice_delta_per_step"] = features["ice_inventory"].diff()
     features["load_ratio"] = features["cooling_load_kw"] / cfg.design_cooling_capacity_kw
     features["kw_per_cooling_kw"] = features["power_kw"] / features["cooling_load_kw"].replace(0, pd.NA)
@@ -48,6 +56,9 @@ def classify_operation_modes(data: pd.DataFrame, config: ModeRuleConfig | None =
     features["base_chiller_on_count"] = _count_running_chillers(data, cfg.base_chiller_ids, cfg)
     features["dual_chiller_on_count"] = _count_running_chillers(data, cfg.dual_mode_chiller_ids, cfg)
     features["ignored_chiller_on_count"] = _count_running_chillers(data, cfg.ignored_chiller_ids, cfg)
+    features["base_chiller_power_kw"] = _sum_chiller_parameter(data, cfg.base_chiller_ids, "power_kw")
+    features["dual_chiller_power_kw"] = _sum_chiller_parameter(data, cfg.dual_mode_chiller_ids, "power_kw")
+    features["effective_chiller_flow_m3h"] = _sum_running_chiller_flow(data, cfg)
     features["cooling_tower_on_count"] = data[ct_power_cols].fillna(0).gt(cfg.tower_power_on_threshold_kw).sum(axis=1)
     features["pump_on_count"] = data[pump_power_cols].fillna(0).gt(cfg.pump_power_on_threshold_kw).sum(axis=1)
     features["min_chiller_setpoint_c"] = data[setpoint_cols].min(axis=1, skipna=True) if setpoint_cols else pd.NA
@@ -180,6 +191,48 @@ def _min_chiller_parameter(data: pd.DataFrame, chiller_ids: tuple[str, ...], par
     if not columns:
         return pd.Series(pd.NA, index=data.index, dtype="Float64")
     return data[columns].min(axis=1, skipna=True)
+
+
+def _sum_chiller_parameter(data: pd.DataFrame, chiller_ids: tuple[str, ...], parameter: str) -> pd.Series:
+    columns = [f"{chiller_id}__{parameter}" for chiller_id in chiller_ids if f"{chiller_id}__{parameter}" in data]
+    if not columns:
+        return pd.Series(0.0, index=data.index, dtype="float64")
+    return data[columns].apply(pd.to_numeric, errors="coerce").fillna(0.0).sum(axis=1)
+
+
+def _sum_running_chiller_flow(data: pd.DataFrame, cfg: ModeRuleConfig) -> pd.Series:
+    total = pd.Series(0.0, index=data.index, dtype="float64")
+    for chiller_id, flow_m3h in cfg.chiller_flow_m3h.items():
+        status_col = f"{chiller_id}__status"
+        power_col = f"{chiller_id}__power_kw"
+        if status_col in data:
+            running = pd.to_numeric(data[status_col], errors="coerce").fillna(0).gt(cfg.chiller_status_on_threshold)
+        elif power_col in data:
+            running = pd.to_numeric(data[power_col], errors="coerce").fillna(0).gt(cfg.chiller_power_on_threshold_kw)
+        else:
+            continue
+        total = total + running.astype(float) * flow_m3h
+    return total
+
+
+def _total_supply_temperature(data: pd.DataFrame) -> pd.Series:
+    """Estimate user-side total chilled-water supply temperature.
+
+    The processed station table has no explicit total supply temperature column.
+    Heat exchanger outlet temperatures are the closest user-side supply proxy.
+    If these columns are unavailable, fall back to the plant ice-side outlet.
+    """
+    preferred_columns = [
+        column
+        for column in ("HE_01__chw_out_temp", "HE_02__chw_out_temp", "HE_03__chw_out_temp")
+        if column in data
+    ]
+    if preferred_columns:
+        return data[preferred_columns].apply(pd.to_numeric, errors="coerce").mean(axis=1, skipna=True)
+    fallback_columns = [column for column in ("ICE_01__chw_out_temp",) if column in data]
+    if fallback_columns:
+        return data[fallback_columns].apply(pd.to_numeric, errors="coerce").mean(axis=1, skipna=True)
+    return pd.Series(pd.NA, index=data.index, dtype="Float64")
 
 
 def _ice_action(value: float, cfg: ModeRuleConfig) -> str:

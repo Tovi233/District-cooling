@@ -14,7 +14,7 @@ DEFAULT_INPUT_DIR = PROJECT_ROOT / "data" / "processed" / "station_flexibility_p
 
 LEVEL_COLORS = {
     "可响应": "#2CA02C",
-    "谨慎响应": "#FFB000",
+    "有限响应": "#FFB000",
     "不建议响应": "#A6A6A6",
 }
 
@@ -49,7 +49,7 @@ def _draw_dashboard(df: pd.DataFrame, summary: pd.DataFrame, output_path: Path) 
     font_small = _font(24)
 
     draw.text((width // 2, 45), "冷站侧可调潜力估算", fill="#111111", font=font_title, anchor="ma")
-    _draw_time_series(draw, df, (90, 135, 1560, 450), font, font_small)
+    _draw_time_series(draw, _with_15min_gaps(df), (90, 135, 1560, 450), font, font_small)
     _draw_duration_bars(draw, summary, (90, 560, 900, 1120), font, font_small)
     _draw_level_pie(draw, df, (1120, 560, 1560, 1000), font, font_small)
     _draw_key_metrics(draw, df, (1650, 160), font, font_small)
@@ -67,15 +67,154 @@ def _draw_time_series(
     draw.text(((x0 + x1) // 2, y0 - 25), "当前总功率与可削减功率", fill="#111111", font=font, anchor="ma")
     chart = (x0 + 90, y0 + 25, x1 - 20, y1 - 60)
     _draw_axes(draw, chart)
-    y_max = max(float(df["power_kw"].max()), float(df["reducible_power_kw"].max()), 1.0) * 1.08
-    power_points = _series_points(df["power_kw"], chart, 0, y_max)
-    reducible_points = _series_points(df["reducible_power_kw"], chart, 0, y_max)
-    draw.line(power_points, fill="#1F77B4", width=4)
-    draw.line(reducible_points, fill="#D62728", width=4)
+    stacked_total = _response_stack_total(df)
+    y_max = max(float(df["power_kw"].max(skipna=True)), float(stacked_total.max(skipna=True)), 1.0) * 1.08
+    _draw_stacked_response_bars(draw, df, chart, 0, y_max)
+    _draw_line_segments(draw, df["power_kw"], chart, 0, y_max, "#1F77B4", 4)
     _draw_y_ticks(draw, chart, 0, y_max, font_small, "kW")
     _draw_time_ticks(draw, df, chart, font_small)
     draw.text((chart[0] + 20, chart[1] + 12), "总功率", fill="#1F77B4", font=font_small, anchor="lm")
-    draw.text((chart[0] + 130, chart[1] + 12), "可削减功率", fill="#D62728", font=font_small, anchor="lm")
+    draw.text((chart[0] + 130, chart[1] + 12), "可削减功率(柱)", fill="#D62728", font=font_small, anchor="lm")
+    _draw_compact_legend(
+        draw,
+        chart[0] + 20,
+        chart[1] + 44,
+        [
+            ("停止/降低制冰", "#FF7F0E"),
+            ("蓄冰替代冷机", "#D62728"),
+            ("供水温度上调", "#0891B2"),
+        ],
+        font_small,
+    )
+
+
+def _with_15min_gaps(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return df.copy()
+    out = df.sort_values("collect_time_iso").copy()
+    full_time = pd.date_range(out["collect_time_iso"].min(), out["collect_time_iso"].max(), freq="15min")
+    out = out.set_index("collect_time_iso").reindex(full_time)
+    out.index.name = "collect_time_iso"
+    return out.reset_index()
+
+
+def _draw_value_bars(
+    draw: ImageDraw.ImageDraw,
+    values: pd.Series,
+    chart: tuple[int, int, int, int],
+    y_min: float,
+    y_max: float,
+    color: str,
+) -> None:
+    x0, y0, x1, y1 = chart
+    n = len(values)
+    if n == 0:
+        return
+    plot_w = x1 - x0
+    bar_w = max(1, int(plot_w / max(n, 1) * 0.82))
+    for i, value in enumerate(values):
+        if pd.isna(value):
+            continue
+        x = x0 + int(i * plot_w / max(n - 1, 1))
+        x_left = max(x0, x - bar_w // 2)
+        x_right = min(x1, x_left + bar_w)
+        y_top = _map_value(float(value), y_min, y_max, y1, y0)
+        draw.rectangle((x_left, y_top, x_right, y1), fill=color)
+
+
+def _response_stack_total(df: pd.DataFrame) -> pd.Series:
+    total = pd.Series(0.0, index=df.index)
+    for column in (
+        "stop_ice_making_power_kw",
+        "load_shift_power_kw",
+        "supply_temp_reduction_power_kw",
+    ):
+        if column in df:
+            total = total + pd.to_numeric(df[column], errors="coerce").fillna(0.0)
+    return total.where(df["power_kw"].notna())
+
+
+def _draw_stacked_response_bars(
+    draw: ImageDraw.ImageDraw,
+    df: pd.DataFrame,
+    chart: tuple[int, int, int, int],
+    y_min: float,
+    y_max: float,
+) -> None:
+    x0, y0, x1, y1 = chart
+    n = len(df)
+    if n == 0:
+        return
+    plot_w = x1 - x0
+    bar_w = max(1, int(plot_w / max(n, 1) * 0.82))
+    stacks = (
+        ("stop_ice_making_power_kw", "#FF7F0E"),
+        ("load_shift_power_kw", "#D62728"),
+        ("supply_temp_reduction_power_kw", "#0891B2"),
+    )
+    for i, row in df.iterrows():
+        if pd.isna(row.get("power_kw")):
+            continue
+        x = x0 + int(i * plot_w / max(n - 1, 1))
+        x_left = max(x0, x - bar_w // 2)
+        x_right = min(x1, x_left + bar_w)
+        cumulative = 0.0
+        for column, color in stacks:
+            value = _safe_float(row.get(column))
+            if value <= 0:
+                continue
+            bottom_y = _map_value(cumulative, y_min, y_max, y1, y0)
+            cumulative += value
+            top_y = _map_value(cumulative, y_min, y_max, y1, y0)
+            draw.rectangle((x_left, top_y, x_right, bottom_y), fill=color)
+
+
+def _draw_compact_legend(
+    draw: ImageDraw.ImageDraw,
+    x: int,
+    y: int,
+    items: list[tuple[str, str]],
+    font: ImageFont.ImageFont,
+) -> None:
+    cursor = x
+    for label, color in items:
+        draw.rectangle((cursor, y - 7, cursor + 28, y + 7), fill=color)
+        draw.text((cursor + 36, y), label, fill="#222222", font=font, anchor="lm")
+        cursor += 36 + draw.textbbox((0, 0), label, font=font)[2] + 26
+
+
+def _safe_float(value: object) -> float:
+    try:
+        if pd.isna(value):
+            return 0.0
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _draw_line_segments(
+    draw: ImageDraw.ImageDraw,
+    values: pd.Series,
+    chart: tuple[int, int, int, int],
+    y_min: float,
+    y_max: float,
+    color: str,
+    width: int,
+) -> None:
+    segment = []
+    x0, _, x1, y1 = chart
+    n = len(values)
+    for i, value in enumerate(values):
+        if pd.isna(value):
+            if len(segment) >= 2:
+                draw.line(segment, fill=color, width=width)
+            segment = []
+            continue
+        x = x0 + int(i * (x1 - x0) / max(n - 1, 1))
+        y = _map_value(float(value), y_min, y_max, y1, chart[1])
+        segment.append((x, y))
+    if len(segment) >= 2:
+        draw.line(segment, fill=color, width=width)
 
 
 def _draw_duration_bars(

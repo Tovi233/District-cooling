@@ -10,12 +10,13 @@ from pathlib import Path
 
 import pandas as pd
 
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from district_cooling.operation import (
+from district_cooling.operation import (  # noqa: E402
     estimate_station_flexibility,
     load_flexibility_config,
     summarize_flexibility,
@@ -84,7 +85,7 @@ def main() -> None:
         },
     }
     meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
-    report_path.write_text(_build_report(flexibility, summary, overall, config.__dict__), encoding="utf-8")
+    report_path.write_text(_build_report(summary, overall, config.__dict__), encoding="utf-8")
 
     print(f"Loaded {len(flexibility)} time points from {args.input}")
     print(f"Wrote flexibility results to {args.output_dir}")
@@ -96,33 +97,33 @@ def _overall_summary(flexibility: pd.DataFrame) -> pd.DataFrame:
         [
             {"指标": "平均当前冷负荷", "数值": flexibility["cooling_load_kw"].mean(), "单位": "kW"},
             {"指标": "平均当前总功率", "数值": flexibility["power_kw"].mean(), "单位": "kW"},
+            {"指标": "平均系统综合COP", "数值": flexibility["station_cop"].mean(), "单位": "-"},
             {"指标": "平均可削减功率", "数值": flexibility["reducible_power_kw"].mean(), "单位": "kW"},
             {"指标": "最大可削减功率", "数值": flexibility["reducible_power_kw"].max(), "单位": "kW"},
+            {"指标": "平均供水温度上调可削减功率", "数值": flexibility["supply_temp_reduction_power_kw"].mean(), "单位": "kW"},
+            {"指标": "平均供水过冷温差", "数值": flexibility["overcooling_delta_temp_c"].mean(), "单位": "degC"},
             {"指标": "平均可响应时长", "数值": flexibility["response_duration_h"].mean(), "单位": "h"},
+            {"指标": "平均蓄冰可释冷支撑时长", "数值": flexibility["ice_supported_duration_h"].mean(), "单位": "h"},
             {"指标": "平均可转移冷量", "数值": flexibility["transferable_cooling_energy_kwh"].mean(), "单位": "kWh"},
             {"指标": "平均反弹功率", "数值": flexibility["rebound_power_kw"].mean(), "单位": "kW"},
             {"指标": "可响应点数", "数值": float(response_counts.get("可响应", 0)), "单位": "点"},
-            {"指标": "谨慎响应点数", "数值": float(response_counts.get("谨慎响应", 0)), "单位": "点"},
+            {"指标": "有限响应点数", "数值": float(response_counts.get("有限响应", 0)), "单位": "点"},
             {"指标": "不建议响应点数", "数值": float(response_counts.get("不建议响应", 0)), "单位": "点"},
         ]
     )
 
 
-def _build_report(
-    flexibility: pd.DataFrame,
-    summary: pd.DataFrame,
-    overall: pd.DataFrame,
-    config_values: dict,
-) -> str:
+def _build_report(summary: pd.DataFrame, overall: pd.DataFrame, config_values: dict) -> str:
     lines = [
         "# 冷站侧可调潜力估算结果",
         "",
         "## 计算口径",
         "",
-        "- 本结果属于第一阶段快速估算: 仅使用冷站侧数据, 暂不耦合建筑热惯性和管网动态。",
-        "- 冰量按剩余冷量处理, 单位换算采用 1 RT-h = 3.517 kWh。",
-        "- 可调机制包括: 制冰时停止/降低制冰负荷; 机械制冷时用可用蓄冰替代部分冷机供冷。",
-        "- 反弹功率按后续恢复制冰补回冷量估算。",
+        "- 本结果属于第一阶段快速估算，仅使用冷站侧数据，暂不耦合建筑热惯性和管网动态。",
+        "- 制冰阶段根据双工况机组低温出水和制冰能力估算停止制冰可削减功率。",
+        "- 机械制冷阶段根据可用释冰功率替代正在运行的冷机冷量，并按被替代冷机 COP 折算削减电功率。",
+        "- 当基载和双工况同时运行时，释冰优先替代双工况冷量，再替代基载冷量。",
+        "- 当用户侧总供水温度低于合同供水温度时，将过冷冷量换算为可上调供水温度带来的可削减电功率。",
         "",
         "## 关键假设",
         "",

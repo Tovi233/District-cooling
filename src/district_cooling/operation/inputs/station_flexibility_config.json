@@ -6,11 +6,16 @@
   "mechanical_cooling_cop": 5.8,
   "ice_making_cop": 4.11,
   "restore_duration_h": 4.0,
+  "max_ice_inventory_kwh": 81239.0,
   "max_ice_discharge_power_kw": null,
   "max_ice_discharge_quantile": 0.95,
   "min_reducible_power_kw_for_available": 1000.0,
   "min_duration_h_for_available": 1.0,
-  "min_reducible_power_kw_for_cautious": 300.0,
-  "min_duration_h_for_cautious": 0.5,
-  "note": "First-stage cold-station-only flexibility estimation. Ice inventory is treated as remaining cooling energy in RT-h and converted with 1 RT-h = 3.517 kWh. If max_ice_discharge_power_kw is null, the observed positive ice-discharge-power quantile is used."
+  "min_reducible_power_kw_for_limited": 300.0,
+  "min_duration_h_for_limited": 0.5,
+  "contract_supply_temp_c": 4.0,
+  "water_heat_kw_per_m3h_c": 1.163,
+  "base_chiller_flow_m3h": 788.0,
+  "dual_chiller_flow_m3h": 1200.0,
+  "note": "First-stage cold-station-only flexibility estimation. Phase-1 ice storage design capacity is 81239 kWh / 23100 RT-h from 25 ice-coil groups; ice inventory is treated as remaining cooling energy in RT-h and converted with 1 RT-h = 3.517 kWh. If max_ice_discharge_power_kw is null, the observed positive ice-discharge-power quantile is used. contract_supply_temp_c is the chilled-water supply temperature promised in the operation contract; when measured total supply temperature is lower than it, the overcooling cooling load is converted into reducible electric power. The flow used by the overcooling calculation is linked to running chiller counts/equipment status instead of the raw station total-flow column."
 }
